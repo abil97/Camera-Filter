@@ -22,7 +22,7 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String currentPhotoPath = null;
+    private String currentPhotoPath = null; // Path where photo will be saved
     private ImageView mImageView;
     private Bitmap mBitmap;
 
@@ -31,18 +31,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Initialize imageView
         mImageView = findViewById(R.id.imageView);
+
+        // Set some "default" image on the imageView using Bitmap
         mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bliss);
         mImageView.setImageBitmap(mBitmap);
-        //mImageView.setBackgroundResource(R.drawable.bliss);
 
 
-
-
+        // Initialize buttons
         Button displayButton = findViewById(R.id.display);
         Button captureButton = findViewById(R.id.capture);
         Button applyFilter = findViewById(R.id.filter);
 
+
+        // Taking photos and saving them, after clicking on "Capture Button"
         captureButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -51,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Taking last captured image from internal storage and displaying it as a BitMap,
+        // after clicking "Display Button"
         displayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,12 +65,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Applying Black and White filter
         applyFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                // Bitmap isn't mutable! So, to change its pixel values, it's necessary to create a copy
                 mBitmap = mBitmap.copy( Bitmap.Config.ARGB_8888 , true);
 
+                // Get size of the Bitmap
                 int width = mBitmap.getWidth();
                 int height = mBitmap.getHeight();
 
@@ -73,17 +81,22 @@ public class MainActivity extends AppCompatActivity {
                 for(int i = 0; i < width; i++){
                     for(int j = 0; j < height; j++){
 
+                        // Get RGB values of the current pixel
                         int currentPixel = mBitmap.getPixel(i, j);
                         int redValue = Color.red(currentPixel);
                         int blueValue = Color.blue(currentPixel);
                         int greenValue = Color.green(currentPixel);
 
+                        // Get the average value of RGB values
                         int newColorValue = (int) ((redValue + blueValue + greenValue) / 3);
 
+                        // Updating values of the current pixel.
+                        // if values of RGB are equal, then resulting color will be Black & White
                         mBitmap.setPixel(i, j, Color.rgb(newColorValue, newColorValue, newColorValue));
                     }
                 }
 
+                // Setting the updated Bitmap to the imageView
                 mImageView.setImageBitmap(mBitmap);
 
 
@@ -95,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
     static final int REQUEST_TAKE_PHOTO = 1;
 
+    // Function to use camera. Taken from documentation
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -119,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Function to create image file. Taken From documentation
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
